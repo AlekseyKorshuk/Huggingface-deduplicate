@@ -22,7 +22,7 @@ def get_hash(example):
 
 
 def alpha_stats(example):
-    """Calculates mean and max line length of file."""
+    """."""
     alpha_frac = np.mean([c.isalnum() for c in example["content"]])
     return {"alpha_frac": alpha_frac}
 
@@ -36,19 +36,11 @@ def check_uniques(example, uniques):
         return False
 
 
-def char_token_ratio(example):
-    """Compute character/token ratio of the file with tokenizer."""
-    input_ids = tokenizer(example["content"], truncation=False)["input_ids"]
-    ratio = len(example["content"]) / len(input_ids)
-    return {"ratio": ratio}
-
-
 def preprocess(example):
     """Chain all preprocessing steps into one function to not fill cache."""
     results = dict()
     results.update(get_hash(example))
     results.update(alpha_stats(example))
-    results.update(char_token_ratio(example))
     return results
 
 

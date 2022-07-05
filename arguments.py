@@ -35,22 +35,12 @@ class PreprocessingArguments:
     )
 
     alpha_frac: Optional[float] = field(
-        default=0.25, 
+        default=0.4, 
         metadata={"help": "Maximum fraction of non-alphanumeric characters, otherwise file is filtered."}
     )
 
-    min_token_ratio: Optional[float] = field(
-        default=1.5, 
-        metadata={"help": "Minimum character token ratio for the file, otherwise file is filtered."}
-    )
-    
-    filter_proba: Optional[float] = field(
-        default=0.7, 
-        metadata={"help": "Probability for filtering config, test and uncommon files."}
-    )
-
     tokenizer_path: Optional[str] = field(
-        default="./token",
+        default="/home/henry/token",
         metadata={"help": "Path to tokenizer directory."}
     )
     
@@ -60,6 +50,6 @@ class PreprocessingArguments:
     # )
 
     jaccard_threshold: Optional[float] = field(
-        default=0.85, 
+        default=0.95, 
         metadata={"help": "Jaccard threshold for near-duplicate samples."}
     )
