@@ -40,7 +40,7 @@ class PreprocessingArguments:
     )
 
     tokenizer_path: Optional[str] = field(
-        default="/home/henry/token",
+        default="/home/./token",
         metadata={"help": "Path to tokenizer directory."}
     )
     
