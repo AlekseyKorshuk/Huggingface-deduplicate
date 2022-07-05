@@ -18,12 +18,12 @@ tokenizer_path = PreprocessingArguments.tokenizer_path
 
 def get_hash(example):
     """Get hash of content field."""
-    return {"hash": hashlib.md5(example["content"].strip().encode("utf-8")).hexdigest()}
+    return {"hash": hashlib.md5(example["text"].strip().encode("utf-8")).hexdigest()}
 
 
 def alpha_stats(example):
     """."""
-    alpha_frac = np.mean([c.isalnum() for c in example["content"]])
+    alpha_frac = np.mean([c.isalnum() for c in example["text"]])
     return {"alpha_frac": alpha_frac}
 
 
@@ -49,8 +49,6 @@ def filter(example, uniques, args):
     if not check_uniques(example, uniques):
         return False
     elif example["alpha_frac"] < args.alpha_frac:
-        return False
-    elif example["ratio"] < args.min_token_ratio:
         return False
     else:
         return True
