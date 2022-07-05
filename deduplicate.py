@@ -14,17 +14,11 @@ from arguments import PreprocessingArguments
 from minhash_deduplication import deduplicate_dataset
 from transformers import GPT2Tokenizer, HfArgumentParser
 
-tokenizer_path = './token'
+tokenizer_path = PreprocessingArguments.tokenizer_path
 
 def get_hash(example):
     """Get hash of content field."""
     return {"hash": hashlib.md5(example["content"].strip().encode("utf-8")).hexdigest()}
-
-
-def line_stats(example):
-    """Calculates mean and max line length of file."""
-    line_lengths = [len(line) for line in example["content"].splitlines()]
-    return {"line_mean": np.mean(line_lengths), "line_max": max(line_lengths)}
 
 
 def alpha_stats(example):
@@ -53,7 +47,6 @@ def preprocess(example):
     """Chain all preprocessing steps into one function to not fill cache."""
     results = dict()
     results.update(get_hash(example))
-    results.update(line_stats(example))
     results.update(alpha_stats(example))
     results.update(char_token_ratio(example))
     return results
@@ -62,10 +55,6 @@ def preprocess(example):
 def filter(example, uniques, args):
     """Filter dataset with heuristics. Config, test and has_no_keywords files are removed with a given probability."""
     if not check_uniques(example, uniques):
-        return False
-    elif example["line_max"] > args.line_max:
-        return False
-    elif example["line_mean"] > args.line_mean:
         return False
     elif example["alpha_frac"] < args.alpha_frac:
         return False
@@ -117,11 +106,10 @@ print(f"Time to filter dataset: {time.time()-t_start:.2f}")
 print(f"Size of filtered dataset: {len(ds_filter)}")
 
 # Deduplicate with minhash and jaccard similarity
-if args.near_deduplication:
-    t_start = time.time()
-    ds_filter, duplicate_clusters = deduplicate_dataset(ds_filter, args.jaccard_threshold)
-    print(f"Time to deduplicate dataset: {time.time()-t_start:.2f}")
-    print(f"Size of deduplicate dataset: {len(ds_filter)}")
+t_start = time.time()
+ds_filter, duplicate_clusters = deduplicate_dataset(ds_filter, args.jaccard_threshold)
+print(f"Time to deduplicate dataset: {time.time()-t_start:.2f}")
+print(f"Size of deduplicate dataset: {len(ds_filter)}")
 
 # Save data in batches of samples_per_file
 output_dir = Path(args.output_dir)
@@ -129,9 +117,8 @@ output_dir.mkdir(exist_ok=True)
 
 # save duplicate_clusters in the output_dir as artifacts
 # not sure it is the right place the save it
-if args.near_deduplication:
-    with open(output_dir / "duplicate_clusters.json", "w") as f:
-        json.dump(duplicate_clusters, f)
+with open(output_dir / "duplicate_clusters.json", "w") as f:
+    json.dump(duplicate_clusters, f)
 
 data_dir = output_dir / "data"
 data_dir.mkdir(exist_ok=True)

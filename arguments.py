@@ -33,16 +33,6 @@ class PreprocessingArguments:
         default="text", 
         metadata={"help": "Column containing text data to process."}
     )
-    
-    line_max: Optional[float] = field(
-        default=1000, 
-        metadata={"help": "Maximum line length in file, otherwise file is filtered."}
-    )
-
-    line_mean: Optional[float] = field(
-        default=100, 
-        metadata={"help": "Maximum mean line length in file, otherwise file is filtered."}
-    )
 
     alpha_frac: Optional[float] = field(
         default=0.25, 
@@ -58,16 +48,16 @@ class PreprocessingArguments:
         default=0.7, 
         metadata={"help": "Probability for filtering config, test and uncommon files."}
     )
+
+    tokenizer_path: Optional[str] = field(
+        default="./token",
+        metadata={"help": "Path to tokenizer directory."}
+    )
     
     # tokenizer: Optional[str] = field(
     #     default="lvwerra/codeparrot",
     #     metadata={"help": "Name or path to the tokenizer."},
     # )
-
-    near_deduplication: Optional[bool] = field(
-        default=True, 
-        metadata={"help": "If True, near-duplicate samples are removed."}
-    )
 
     jaccard_threshold: Optional[float] = field(
         default=0.85, 
