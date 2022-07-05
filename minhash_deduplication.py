@@ -84,7 +84,7 @@ class DuplicationIndex:
         for base, duplicates in self._duplicate_clusters.items():
             cluster = [base] + list(duplicates)
             # reformat the cluster to be a list of dict
-            cluster = [{"base_index": el[0], "repo_name": el[1], "path": el[2]} for el in cluster]
+            cluster = [{"base_index": el, "meta": el} for el in cluster]
             duplicate_clusters.append(cluster)
         return duplicate_clusters
 
@@ -96,9 +96,9 @@ class DuplicationIndex:
 
 def _compute_min_hash(element):
     index, data = element
-    min_hash = get_min_hash([t for t in NON_ALPHA.split(data["content"]) if len(t.strip()) > 0])
+    min_hash = get_min_hash([t for t in NON_ALPHA.split(data["text"]) if len(t.strip()) > 0])
     if min_hash is not None:
-        return (index, data["repo_name"], data["path"]), min_hash
+        return index, min_hash
 
 
 def minhash_iter(dataset_iterator: Type[Dataset]):
@@ -160,9 +160,9 @@ def _find_cluster_extremes_shared(cluster, jaccard_threshold):
     """
     extremes = []
     for element1 in cluster:
-        code1 = _shared_dataset[element1["base_index"]]["content"]
+        code1 = _shared_dataset[element1["base_index"]]["text"]
         for element2 in extremes:
-            code2 = _shared_dataset[element2["base_index"]]["content"]
+            code2 = _shared_dataset[element2["base_index"]]["text"]
             if jaccard_similarity(code1, code2) >= jaccard_threshold:
                 element2["copies"] += 1
                 break
@@ -219,7 +219,7 @@ def deduplicate_dataset(
     Args:
         dataset (Type[Dataset]):
             The dataset to deduplicate.
-        jaccard_threshold (float, default=0.85):
+        jaccard_threshold (float, default=0.95):
             jaccard threshold to determine if two codes are similar
 
     Returns:
