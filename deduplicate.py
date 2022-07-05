@@ -12,7 +12,9 @@ from datasets import load_dataset
 
 from arguments import PreprocessingArguments
 from minhash_deduplication import deduplicate_dataset
-from transformers import AutoTokenizer, HfArgumentParser
+from transformers import GPT2Tokenizer, HfArgumentParser
+
+tokenizer_path = './token'
 
 def get_hash(example):
     """Get hash of content field."""
@@ -84,9 +86,14 @@ def compress_file(file_path):
 # Settings
 parser = HfArgumentParser(PreprocessingArguments)
 args = parser.parse_args()
+
 if args.num_workers is None:
     args.num_workers = multiprocessing.cpu_count()
-#tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_dir)
+
+tokenizer = tokenizer = GPT2Tokenizer(
+    vocab_file = tokenizer_path + "/vocab.json", 
+    merges_file = tokenizer_path + "/merges.txt"
+)
 
 # Load dataset
 t_start = time.time()

@@ -37,7 +37,7 @@ class DuplicationIndex:
     def __init__(
         self,
         *,
-        duplication_jaccard_threshold: float = 0.85,
+        duplication_jaccard_threshold: float = 0.95,
     ):
         self._duplication_jaccard_threshold = duplication_jaccard_threshold
         self._num_perm = NUM_PERM

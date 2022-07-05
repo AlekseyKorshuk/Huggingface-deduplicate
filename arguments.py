@@ -10,17 +10,17 @@ class PreprocessingArguments:
     num_workers: Optional[int] = field(
         default=None,
         metadata={
-            "help": "The number of CPU cores to use for parallel preprocessing. Default uses the maximum available."
+            "help": "The number of CPU cores to use for parallel preprocessing."
         },
     )
     
     dataset_name: Optional[str] = field(
-        default="transformersbook/codeparrot", 
+        default="conceptofmind/pile_dm_mathematics", 
         metadata={"help": "Folder or name of dataset to process."}
     )
     
     output_dir: Optional[str] = field(
-        default="codeparrot-clean", 
+        default="pile_dm_mathematics_clean", 
         metadata={"help": "Folder to save processed processed dataset."}
     )
     
@@ -30,7 +30,7 @@ class PreprocessingArguments:
     )
     
     text_column: Optional[str] = field(
-        default="content", 
+        default="text", 
         metadata={"help": "Column containing text data to process."}
     )
     
@@ -59,10 +59,10 @@ class PreprocessingArguments:
         metadata={"help": "Probability for filtering config, test and uncommon files."}
     )
     
-    tokenizer: Optional[str] = field(
-        default="lvwerra/codeparrot",
-        metadata={"help": "Name or path to the tokenizer."},
-    )
+    # tokenizer: Optional[str] = field(
+    #     default="lvwerra/codeparrot",
+    #     metadata={"help": "Name or path to the tokenizer."},
+    # )
 
     near_deduplication: Optional[bool] = field(
         default=True, 
