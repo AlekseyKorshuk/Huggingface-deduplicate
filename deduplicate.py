@@ -12,7 +12,7 @@ from datasets import load_dataset
 
 from arguments import PreprocessingArguments
 from minhash_deduplication import deduplicate_dataset
-from transformers import GPT2Tokenizer, HfArgumentParser
+from transformers import HfArgumentParser
 
 tokenizer_path = PreprocessingArguments.tokenizer_path
 
@@ -68,11 +68,6 @@ args = parser.parse_args()
 
 if args.num_workers is None:
     args.num_workers = multiprocessing.cpu_count()
-
-tokenizer = tokenizer = GPT2Tokenizer(
-    vocab_file = tokenizer_path + "/vocab.json", 
-    merges_file = tokenizer_path + "/merges.txt"
-)
 
 # Load dataset
 t_start = time.time()

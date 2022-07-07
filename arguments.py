@@ -15,12 +15,12 @@ class PreprocessingArguments:
     )
     
     dataset_name: Optional[str] = field(
-        default="conceptofmind/pile_hacker_news", 
+        default="conceptofmind/pile_enron_emails", 
         metadata={"help": "Folder or name of dataset to process."}
     )
     
     output_dir: Optional[str] = field(
-        default="pile_hacker_news_clean", 
+        default="pile_enron_emails_clean", 
         metadata={"help": "Folder to save processed processed dataset."}
     )
     
@@ -40,7 +40,7 @@ class PreprocessingArguments:
     )
 
     tokenizer_path: Optional[str] = field(
-        default="/home/./token",
+        default="/home/henry/token",
         metadata={"help": "Path to tokenizer directory."}
     )
     

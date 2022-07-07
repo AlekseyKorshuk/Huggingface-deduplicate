@@ -84,7 +84,7 @@ class DuplicationIndex:
         for base, duplicates in self._duplicate_clusters.items():
             cluster = [base] + list(duplicates)
             # reformat the cluster to be a list of dict
-            cluster = [{"base_index": el, "meta": el} for el in cluster]
+            cluster = [{"base_index": el} for el in cluster]
             duplicate_clusters.append(cluster)
         return duplicate_clusters
 
