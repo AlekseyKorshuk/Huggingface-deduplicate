@@ -5,6 +5,7 @@ import multiprocessing
 import os
 import shutil
 import time
+import re
 from pathlib import Path
 
 import numpy as np
@@ -14,11 +15,11 @@ from arguments import PreprocessingArguments
 from minhash_deduplication import deduplicate_dataset
 from transformers import HfArgumentParser
 
-tokenizer_path = PreprocessingArguments.tokenizer_path
+PATTERN = re.compile(r"\s+")
 
 def get_hash(example):
     """Get hash of content field."""
-    return {"hash": hashlib.md5(example["text"].strip().encode("utf-8")).hexdigest()}
+    return {"hash": hashlib.md5(re.sub(PATTERN, "", example["text"]).encode("utf-8")).hexdigest()}
 
 
 def alpha_stats(example):

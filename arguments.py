@@ -43,11 +43,6 @@ class PreprocessingArguments:
         default="/home/henry/token",
         metadata={"help": "Path to tokenizer directory."}
     )
-    
-    # tokenizer: Optional[str] = field(
-    #     default="lvwerra/codeparrot",
-    #     metadata={"help": "Name or path to the tokenizer."},
-    # )
 
     jaccard_threshold: Optional[float] = field(
         default=0.95, 
