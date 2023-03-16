@@ -1,1 +1,1 @@
-from .minhash_deduplication import deduplicate_dataset
+from hf_deduplication.minhash_deduplication import deduplicate_dataset
