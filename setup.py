@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages, Extension
+from setuptools import setup
 
 setup(
     name='Huggingface Deduplication',
@@ -8,5 +8,4 @@ setup(
     author='AlekseyKorshuk',
     author_email='ale-kor02@mail.ru',
     description='Huggingface Deduplication',
-    long_description=str(open('README.rst').read())
 )
