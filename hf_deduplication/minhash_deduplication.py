@@ -11,11 +11,12 @@ from tqdm import tqdm
 from datasketch import MinHash, MinHashLSH
 from dpu_utils.utils.iterators import ThreadedIterator
 
-
 NON_ALPHA = re.compile("[^A-Za-z_0-9]")
 # parameters used in DuplicationIndex
 MIN_NUM_TOKENS = 10
 NUM_PERM = 256
+
+column_name_ = "edited_response"
 
 
 def get_min_hash(tokens: List[str]) -> Optional[MinHash]:
@@ -35,9 +36,9 @@ def get_tokens(code: str) -> Set[str]:
 
 class DuplicationIndex:
     def __init__(
-        self,
-        *,
-        duplication_jaccard_threshold: float = 0.95,
+            self,
+            *,
+            duplication_jaccard_threshold: float = 0.95,
     ):
         self._duplication_jaccard_threshold = duplication_jaccard_threshold
         self._num_perm = NUM_PERM
@@ -96,7 +97,8 @@ class DuplicationIndex:
 
 def _compute_min_hash(element):
     index, data = element
-    min_hash = get_min_hash([t for t in NON_ALPHA.split(data["text"]) if len(t.strip()) > 0])
+
+    min_hash = get_min_hash([t for t in NON_ALPHA.split(data[column_name_]) if len(t.strip()) > 0])
     if min_hash is not None:
         return index, min_hash
 
@@ -104,15 +106,15 @@ def _compute_min_hash(element):
 def minhash_iter(dataset_iterator: Type[Dataset]):
     with mp.Pool() as pool:
         for data in pool.imap_unordered(
-            _compute_min_hash,
-            ThreadedIterator(dataset_iterator, max_queue_size=10000),
-            chunksize=100,
+                _compute_min_hash,
+                ThreadedIterator(dataset_iterator, max_queue_size=10000),
+                chunksize=100,
         ):
             if data is not None:
                 yield data
 
 
-def make_duplicate_clusters(dataset_iterator: Type[Dataset], jaccard_threshold: float):
+def make_duplicate_clusters(dataset_iterator, jaccard_threshold: float):
     """Find duplicate clusters in the dataset in two steps:
     1. Compute MinHash for each code snippet. MinHash is a tool for fast jaccard similarity estimation.
     This step is computed using an asynchronous multiprocessing pool, minhash_iter
@@ -160,9 +162,9 @@ def _find_cluster_extremes_shared(cluster, jaccard_threshold):
     """
     extremes = []
     for element1 in cluster:
-        code1 = _shared_dataset[element1["base_index"]]["text"]
+        code1 = _shared_dataset[element1["base_index"]][column_name_]
         for element2 in extremes:
-            code2 = _shared_dataset[element2["base_index"]]["text"]
+            code2 = _shared_dataset[element2["base_index"]][column_name_]
             if jaccard_similarity(code1, code2) >= jaccard_threshold:
                 element2["copies"] += 1
                 break
@@ -198,18 +200,18 @@ def find_extremes(cluster_list, dataset, jaccard_threshold):
     f = partial(_find_cluster_extremes_shared, jaccard_threshold=jaccard_threshold)
     with mp.Pool() as pool:
         for extremes in tqdm(
-            pool.imap_unordered(
-                f,
-                cluster_list,
-            ),
-            total=len(cluster_list),
+                pool.imap_unordered(
+                    f,
+                    cluster_list,
+                ),
+                total=len(cluster_list),
         ):
             extremes_list.append(extremes)
     return extremes_list
 
 
 def deduplicate_dataset(
-    dataset: Type[Dataset], jaccard_threshold: float = 0.85
+        dataset: Type[Dataset], jaccard_threshold: float = 0.85, column_name: str = "edited_response"
 ) -> Tuple[Type[Dataset], List[List[Dict]]]:
     """Deduplicate the dataset using minhash and jaccard similarity.
     This function first generate duplicate clusters, then each cluster
@@ -221,6 +223,8 @@ def deduplicate_dataset(
             The dataset to deduplicate.
         jaccard_threshold (float, default=0.95):
             jaccard threshold to determine if two codes are similar
+        column_name (str, default="edited_response")
+            Column name to calculate hash on
 
     Returns:
         ds_dedup (Type[Dataset]):
@@ -240,10 +244,12 @@ def deduplicate_dataset(
 
     Example:
         >>> from datasets import load_dataset
-        >>> from minhash_deduplication import deduplicate_dataset
+        >>> from hf_deduplication.minhash_deduplication import deduplicate_dataset
         >>> ds = load_dataset("lvwerra/codeparrot-clean", split="train")
         >>> ds_dedup, duplicate_clusters = deduplicate_dataset(ds, jaccard_threshold=0.85)
     """
+    global column_name_
+    column_name_ = column_name
     duplicate_clusters = make_duplicate_clusters(dataset, jaccard_threshold)
     duplicate_indices = set(x["base_index"] for cluster in duplicate_clusters for x in cluster)
     extreme_dict = {}
